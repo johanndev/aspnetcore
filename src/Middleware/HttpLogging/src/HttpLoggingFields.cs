@@ -129,30 +129,80 @@ namespace Microsoft.AspNetCore.HttpLogging
         /// </summary>
         ResponseBody = 0x800,
 
+        /// <summary>
+        /// Flag for logging the date and time
+        /// that the activity occurred.
+        /// </summary>
         DateTime = 0x1000,
 
+        /// <summary>
+        /// Flag for logging the IP address
+        /// of the client sending the <see cref="HttpRequest"/>.
+        /// </summary>
         ClientIpAddress = 0x2000,
 
+        /// <summary>
+        /// Flag for logging the IP address
+        /// of the server sending the <see cref="HttpResponse"/>.
+        /// </summary>
         ServerIpAddress = 0x4000,
 
+        /// <summary>
+        /// Flag for logging the port number
+        /// the client is connected to.
+        /// </summary>
         ServerPort = 0x8000,
 
+        /// <summary>
+        /// Flag for logging the query, if any,
+        /// the client was trying to perform.
+        /// </summary>
         RequestQuery = 0x10000,
 
+        /// <summary>
+        /// Flag for logging the content of the cookie
+        /// sent by the client, if any.
+        /// </summary>
         RequestCookie = 0x20000,
 
+        /// <summary>
+        /// Flag for logging the name of the
+        /// authenticated user that accessed the server.
+        /// </summary>
+        UserName = 0x40000,
+
+        /// <summary>
+        /// Flag for logging properties that are part of the <see cref="HttpContext"/>
+        /// Includes <see cref="ClientIpAddress"/>, <see cref="ServerIpAddress"/> and <see cref="ServerPort"/>.
+        /// </summary>
         ConnectionInfoFields = ClientIpAddress | ServerIpAddress | ServerPort,
 
+        /// <summary>
+        /// Flag for logging the default collection of properties that are included in the
+        /// W3C Server Logs, including <see cref="DateTime"/>, <see cref="ConnectionInfoFields"/>, <see cref="RequestHeaders"/>,
+        /// <see cref="RequestProtocol"/>, <see cref="RequestMethod"/>, <see cref="RequestQuery"/>, <see cref="ResponseStatusCode"/>,
+        /// and <see cref="ResponseHeaders"/>.
+        /// </summary>
         W3CDefaultFields = DateTime | ConnectionInfoFields | RequestHeaders | RequestProtocol | RequestMethod | RequestQuery | ResponseStatusCode | ResponseHeaders,
 
-        W3COptionalFields = RequestCookie,
+        /// <summary>
+        /// Flag for logging properties which are considered optional for
+        /// W3C Server Logs, including <see cref="RequestCookie"/> and <see cref="UserName"/>.
+        /// These fields contain information which could expose
+        /// identifiable information about the client user.
+        /// </summary>
+        W3COptionalFields = RequestCookie | UserName,
 
+        /// <summary>
+        /// Flag for logging all properties that can be included in the
+        /// W3C Server Logs, including <see cref="W3CDefaultFields"/> and <see cref="W3COptionalFields"/>.
+        /// </summary>
         W3CAllFields = W3CDefaultFields | W3COptionalFields,
 
         /// <summary>
         /// Flag for logging a collection of HTTP Request properties,
         /// including <see cref="RequestPath"/>, <see cref="RequestQueryString"/>, <see cref="RequestProtocol"/>,
-        /// <see cref="RequestMethod"/>, and <see cref="RequestScheme"/>.
+        /// <see cref="RequestMethod"/>, <see cref="RequestScheme"/>, <see cref="RequestQuery"/>, and <see cref="RequestCookie"/>.
         /// </summary>
         RequestProperties = RequestPath | RequestQueryString | RequestProtocol | RequestMethod | RequestScheme | RequestQuery | RequestCookie,
 
@@ -187,7 +237,7 @@ namespace Microsoft.AspNetCore.HttpLogging
         /// <summary>
         /// Flag for logging both the HTTP Request and Response,
         /// in addition to all W3C Logging fields.
-        /// Includes <see cref="Request"/> and <see cref="Response"/>.
+        /// Includes <see cref="Request"/>, <see cref="Response"/>, and <see cref="W3CAllFields"/>.
         /// Logging the request and response body has performance implications, as it requires buffering
         /// the entire request and response body up to the <see cref="HttpLoggingOptions.RequestBodyLogLimit"/>
         /// and <see cref="HttpLoggingOptions.ResponseBodyLogLimit"/>.

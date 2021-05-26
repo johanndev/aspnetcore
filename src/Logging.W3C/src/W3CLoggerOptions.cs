@@ -2,6 +2,9 @@ using System;
 
 namespace Microsoft.Extensions.Logging.W3C
 {
+    /// <summary>
+    /// Options for the <see cref="W3CLogger"/>.
+    /// </summary>
     public class W3CLoggerOptions
     {
         private int? _fileSizeLimit = 10 * 1024 * 1024;
@@ -11,7 +14,7 @@ namespace Microsoft.Extensions.Logging.W3C
         /// <summary>
         /// Fields to log. Defaults to logging request and response properties and headers.
         /// </summary>
-        public W3CLoggingFields LoggingFields { get; set; } = W3CLoggingFields.All;
+        public W3CLoggingFields LoggingFields { get; set; } = W3CLoggingFields.Default;
 
         /// <summary>
         /// Gets or sets a strictly positive value representing the maximum log size in bytes or null for no limit.

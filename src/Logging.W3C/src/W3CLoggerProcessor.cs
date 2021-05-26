@@ -130,10 +130,6 @@ namespace Microsoft.Extensions.Logging.W3C
             {
                 sb.Append("cs-username ");
             }
-            if (_loggingFields.HasFlag(W3CLoggingFields.ServiceName))
-            {
-                sb.Append("s-sitename ");
-            }
             if (_loggingFields.HasFlag(W3CLoggingFields.ServerName))
             {
                 sb.Append("s-computername ");
@@ -181,6 +177,10 @@ namespace Microsoft.Extensions.Logging.W3C
             if (_loggingFields.HasFlag(W3CLoggingFields.Cookie))
             {
                 sb.Append("cs(Cookie) ");
+            }
+            if (_loggingFields.HasFlag(W3CLoggingFields.Referrer))
+            {
+                sb.Append("cs(Referer) ");
             }
 
             _fieldsDirective = sb.ToString().Trim();

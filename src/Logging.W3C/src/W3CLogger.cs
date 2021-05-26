@@ -80,29 +80,37 @@ namespace Microsoft.Extensions.Logging.W3C
             string[] elements = new string[Enum.GetValues(typeof(W3CLoggingFields)).Length - 1];
             foreach(KeyValuePair<string, string> kvp in stateProperties)
             {
+                var val = kvp.Value;
+                if (String.IsNullOrEmpty(val))
+                {
+                    val = "";
+                }
                 switch (kvp.Key)
                 {
                     case nameof(HttpRequest.Method):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.Method)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.Method)] = val.Trim();
                         break;
                     case nameof(HttpRequest.Query):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.UriQuery)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.UriQuery)] = val.Trim();
                         break;
                     case nameof(HttpResponse.StatusCode):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.ProtocolStatus)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.ProtocolStatus)] = val.Trim();
                         break;
                     case nameof(HttpRequest.Protocol):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.ProtocolVersion)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.ProtocolVersion)] = val.Trim();
                         break;
                     case nameof(HeaderNames.Host):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.Host)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.Host)] = val.Trim();
                         break;
                     case "User-Agent":
                         // User-Agent can have whitespace - we replace whitespace characters with the '+' character
-                        elements[BitOperations.Log2((int)W3CLoggingFields.UserAgent)] = Regex.Replace(kvp.Value.Trim(), @"\s", "+");
+                        elements[BitOperations.Log2((int)W3CLoggingFields.UserAgent)] = Regex.Replace(val.Trim(), @"\s", "+");
+                        break;
+                    case nameof(HeaderNames.Referer):
+                        elements[BitOperations.Log2((int)W3CLoggingFields.Referrer)] = val.Trim();
                         break;
                     case nameof(DateTime):
-                        DateTime dt = DateTime.Parse(kvp.Value, CultureInfo.InvariantCulture);
+                        DateTime dt = DateTime.Parse(val, CultureInfo.InvariantCulture);
                         elements[BitOperations.Log2((int)W3CLoggingFields.Date)] = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                         elements[BitOperations.Log2((int)W3CLoggingFields.Time)] = dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
                         // We estimate time elapsed by diffing the current time with the time at which the middleware processed the request/response.
@@ -111,20 +119,23 @@ namespace Microsoft.Extensions.Logging.W3C
                         elements[BitOperations.Log2((int)W3CLoggingFields.TimeTaken)] = elapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
                         break;
                     case nameof(HeaderNames.Server):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.ServerName)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.ServerName)] = val.Trim();
                         break;
                     case nameof(ConnectionInfo.RemoteIpAddress):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.ClientIpAddress)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.ClientIpAddress)] = val.Trim();
                         break;
                     case nameof(ConnectionInfo.LocalIpAddress):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.ServerIpAddress)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.ServerIpAddress)] = val.Trim();
                         break;
                     case nameof(ConnectionInfo.LocalPort):
-                        elements[BitOperations.Log2((int)W3CLoggingFields.ServerPort)] = kvp.Value.Trim();
+                        elements[BitOperations.Log2((int)W3CLoggingFields.ServerPort)] = val.Trim();
+                        break;
+                    case nameof(HttpContext.User):
+                        elements[BitOperations.Log2((int)W3CLoggingFields.UserName)] = val.Trim();
                         break;
                     case nameof(HttpRequest.Cookies):
                         // Cookie can have whitespace - we replace whitespace characters with the '+' character
-                        elements[BitOperations.Log2((int)W3CLoggingFields.Cookie)] = Regex.Replace(kvp.Value.Trim(), @"\s", "+");
+                        elements[BitOperations.Log2((int)W3CLoggingFields.Cookie)] = Regex.Replace(val.Trim(), @"\s", "+");
                         break;
                     default:
                         break;
@@ -135,7 +146,7 @@ namespace Microsoft.Extensions.Logging.W3C
             {
                 if (_loggingFields.HasFlag((W3CLoggingFields)(1 << i)))
                 {
-                    // If the element was not logged, or was the empty strong, we log it as a dash
+                    // If the element was not logged, or was the empty string, we log it as a dash
                     if (String.IsNullOrEmpty(elements[i]))
                     {
                         sb.Append("- ");

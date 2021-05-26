@@ -57,6 +57,8 @@ namespace Microsoft.AspNetCore.HttpLogging
             _options = options;
 
             // By default, disable sending events to W3CLogger
+            // TODO - it seems odd to add this rule so late. Would it be better to add it in the extension method that adds HttpLoggingMiddleware?
+            // Somewhere else?
             _filterOptions.CurrentValue.Rules.Add(new LoggerFilterRule(null, "Microsoft.AspNetCore.W3CLogging", LogLevel.None, null));
 
             _httpLogger = loggerFactory.CreateLogger<HttpLoggingMiddleware>();
@@ -71,7 +73,6 @@ namespace Microsoft.AspNetCore.HttpLogging
         /// <returns></returns>HttpResponseLog.cs
         public Task Invoke(HttpContext context)
         {
-            Debugger.Launch();
             var httpEnabled = _httpLogger.IsEnabled(LogLevel.Information);
             var w3cEnabled = _w3cLogger.IsEnabled(LogLevel.Information);
             if (!httpEnabled && !w3cEnabled)
@@ -94,6 +95,11 @@ namespace Microsoft.AspNetCore.HttpLogging
                 if (options.LoggingFields.HasFlag(HttpLoggingFields.DateTime))
                 {
                     AddToList(w3cList, nameof(DateTime), DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                }
+
+                if (options.LoggingFields.HasFlag(HttpLoggingFields.UserName))
+                {
+                    AddToList(w3cList, nameof(HttpContext.User), context.User is null ? "" : (context.User.Identity is null ? "" : (context.User.Identity.Name is null ? "" : context.User.Identity.Name)));
                 }
 
                 if ((HttpLoggingFields.ConnectionInfoFields & options.LoggingFields) != HttpLoggingFields.None)
@@ -168,6 +174,8 @@ namespace Microsoft.AspNetCore.HttpLogging
 
                 if (w3cEnabled && options.LoggingFields.HasFlag(HttpLoggingFields.RequestQuery))
                 {
+                    // TODO - query is written as a list of {Key}:{Value} pairs delimited by semicolon -
+                    // is there a better/standardized format?
                     var query = request.Query;
                     StringBuilder sb = new StringBuilder();
                     foreach (string key in query.Keys)
@@ -188,12 +196,14 @@ namespace Microsoft.AspNetCore.HttpLogging
                     }
                     if (w3cEnabled)
                     {
-                        WriteHeaders(list, request.Headers, options._internalW3CRequestHeaders);
+                        WriteHeaders(w3cList, request.Headers, options._internalW3CRequestHeaders);
                     }
                 }
 
                 if (w3cEnabled && options.LoggingFields.HasFlag(HttpLoggingFields.RequestCookie))
                 {
+                    // TODO - cookies are written as a list of {Key}:{Value} pairs delimited by semicolon -
+                    // is there a better/standardized format?
                     var cookies = request.Cookies;
                     StringBuilder sb = new StringBuilder();
                     foreach (string key in cookies.Keys)

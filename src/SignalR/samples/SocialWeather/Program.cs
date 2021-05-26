@@ -28,8 +28,10 @@ namespace SocialWeather
                         factory.ClearProviders();
                         factory.AddConsole();
                         factory.AddFilter("Console", level => level >= LogLevel.Information);
-                        // With this, w3c is enabled. Without it, both are enabled
-                        factory.AddW3CLogger();
+                        factory.AddW3CLogger(logging =>
+                        {
+                            logging.LoggingFields = W3CLoggingFields.All;
+                        });
                     })
                     .UseKestrel()
                     .UseContentRoot(Directory.GetCurrentDirectory())

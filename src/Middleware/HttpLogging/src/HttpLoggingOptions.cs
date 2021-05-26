@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.HttpLogging
         /// <summary>
         /// Fields to log for the Request and Response. Defaults to logging request and response properties and headers.
         /// </summary>
-        public HttpLoggingFields LoggingFields { get; set; } = HttpLoggingFields.RequestPropertiesAndHeaders | HttpLoggingFields.ResponsePropertiesAndHeaders | HttpLoggingFields.W3CDefaultFields;
+        public HttpLoggingFields LoggingFields { get; set; } = HttpLoggingFields.RequestPropertiesAndHeaders | HttpLoggingFields.ResponsePropertiesAndHeaders | HttpLoggingFields.W3CAllFields;
 
         /// <summary>
         /// Request header values that are allowed to be logged.
@@ -43,6 +43,7 @@ namespace Microsoft.AspNetCore.HttpLogging
         internal HashSet<string> _internalW3CRequestHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             HeaderNames.Host,
+            HeaderNames.Referer,
             HeaderNames.UserAgent
         };
 
