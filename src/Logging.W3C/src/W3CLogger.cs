@@ -13,7 +13,7 @@ using System.Globalization;
 
 namespace Microsoft.Extensions.Logging.W3C
 {
-    internal sealed class W3CLogger : ILogger
+    internal sealed class W3CLogger : ILogger, IDisposable
     {
         private readonly string _name;
         private readonly W3CLoggerProcessor _messageQueue;
@@ -44,6 +44,11 @@ namespace Microsoft.Extensions.Logging.W3C
         public IDisposable BeginScope<TState>(TState state)
         {
             return null;
+        }
+
+        public void Dispose()
+        {
+            _messageQueue.Dispose();
         }
 
         public bool IsEnabled(LogLevel logLevel)

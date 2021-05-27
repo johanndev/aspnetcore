@@ -38,6 +38,10 @@ namespace Microsoft.Extensions.Logging.W3C
         /// <inheritdoc/>
         public void Dispose()
         {
+            foreach (var val in _loggers.Values)
+            {
+                val.Dispose();
+            }
         }
     }
 }
