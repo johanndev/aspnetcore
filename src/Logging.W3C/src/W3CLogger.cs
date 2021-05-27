@@ -37,8 +37,11 @@ namespace Microsoft.Extensions.Logging.W3C
                 _isActive = true;
                 _messageQueue = new W3CLoggerProcessor(_options);
                 _loggingFields = _options.CurrentValue.LoggingFields;
+                LogFileFullName = _messageQueue.FullName;
             }
         }
+
+        public string LogFileFullName { get; }
 
         // TODO - do we need to do anything here?
         public IDisposable BeginScope<TState>(TState state)
@@ -48,7 +51,10 @@ namespace Microsoft.Extensions.Logging.W3C
 
         public void Dispose()
         {
-            _messageQueue.Dispose();
+            if (!(_messageQueue is null))
+            {
+                _messageQueue.Dispose();
+            }
         }
 
         public bool IsEnabled(LogLevel logLevel)

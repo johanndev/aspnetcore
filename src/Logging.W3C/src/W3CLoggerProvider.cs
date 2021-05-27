@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.Logging.W3C
@@ -33,6 +34,22 @@ namespace Microsoft.Extensions.Logging.W3C
             return _loggers.TryGetValue(categoryName, out W3CLogger logger) ?
                 logger :
                 _loggers.GetOrAdd(categoryName, new W3CLogger(categoryName, _options));
+        }
+
+        /// <summary>
+        /// Gets the full path of the log file corresponding with the given <paramref name="categoryName"/>,
+        /// if there is a <see cref="W3CLogger"/> associated with that category.
+        /// </summary>
+        /// <param name="categoryName">The name of the category to look up.</param>
+        /// <returns>
+        /// The full path of the corresponding log file, or
+        /// null if no <see cref="W3CLogger"/> associated with the given category.
+        /// </returns>
+        public string GetLogFileFullName(string categoryName)
+        {
+            return _loggers.TryGetValue(categoryName, out W3CLogger logger) ?
+                logger.LogFileFullName :
+                null;
         }
 
         /// <inheritdoc/>

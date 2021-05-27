@@ -12,6 +12,7 @@ Microsoft.Extensions.Logging.W3C.W3CLoggerOptions.W3CLoggerOptions() -> void
 Microsoft.Extensions.Logging.W3C.W3CLoggerProvider
 Microsoft.Extensions.Logging.W3C.W3CLoggerProvider.CreateLogger(string categoryName) -> Microsoft.Extensions.Logging.ILogger
 Microsoft.Extensions.Logging.W3C.W3CLoggerProvider.Dispose() -> void
+Microsoft.Extensions.Logging.W3C.W3CLoggerProvider.GetLogFileFullName(string categoryName) -> string
 Microsoft.Extensions.Logging.W3C.W3CLoggerProvider.W3CLoggerProvider(Microsoft.Extensions.Options.IOptionsMonitor<Microsoft.Extensions.Logging.W3C.W3CLoggerOptions> options) -> void
 Microsoft.Extensions.Logging.W3C.W3CLoggingFields
 Microsoft.Extensions.Logging.W3C.W3CLoggingFields.All = Microsoft.Extensions.Logging.W3C.W3CLoggingFields.Optional | Microsoft.Extensions.Logging.W3C.W3CLoggingFields.Default -> Microsoft.Extensions.Logging.W3C.W3CLoggingFields

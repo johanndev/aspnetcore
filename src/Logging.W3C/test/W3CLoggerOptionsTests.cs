@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.Extensions.Logging.W3C.Tests

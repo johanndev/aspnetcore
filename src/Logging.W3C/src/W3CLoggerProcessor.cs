@@ -32,9 +32,13 @@ namespace Microsoft.Extensions.Logging.W3C
             _maxFileSize = loggerOptions.FileSizeLimit;
             _loggingFields = loggerOptions.LoggingFields;
 
+            FullName = Path.Combine(_path, $"{_fileName}{Guid.NewGuid().ToString()}.log");
+
             // Start W3C message queue processor
             _outputTask = Task.Run(ProcessLogQueue);
         }
+
+        public string FullName { get; }
 
         public void EnqueueMessage(string message)
         {
@@ -64,12 +68,22 @@ namespace Microsoft.Extensions.Logging.W3C
         {
             try
             {
-                var fullName = Path.Combine(_path, $"{_fileName}{Guid.NewGuid().ToString()}.log");
-                using (var streamWriter = File.AppendText(fullName))
+                Directory.CreateDirectory(_path);
+                var fileInfo = new FileInfo(FullName);
+                using (var streamWriter = File.AppendText(FullName))
                 {
                     foreach (string message in _messageQueue.GetConsumingEnumerable())
                     {
-                        await WriteMessageAsync(message, streamWriter);
+                        // Only write until we've reached _maxFileSize
+                        if (fileInfo.Exists && fileInfo.Length < _maxFileSize)
+                        {
+                            await WriteMessageAsync(message, streamWriter);
+                        }
+                        else
+                        {
+                            _messageQueue.CompleteAdding();
+                            return;
+                        }
                     }
                 }
             }
@@ -85,7 +99,8 @@ namespace Microsoft.Extensions.Logging.W3C
 
         public void Dispose()
         {
-            _messageQueue.Dispose();
+            _messageQueue.CompleteAdding();
+            _outputTask.Wait();
         }
 
         private void WriteDirectives()
@@ -96,7 +111,6 @@ namespace Microsoft.Extensions.Logging.W3C
             }
             _hasWritten = true;
 
-            Directory.CreateDirectory(_path);
             EnqueueMessage("#Version: 1.0");
 
             var startTimeBuilder = new StringBuilder("#Start-Date: ");
