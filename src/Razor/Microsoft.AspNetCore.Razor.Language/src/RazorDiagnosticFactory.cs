@@ -588,6 +588,17 @@ namespace Microsoft.AspNetCore.Razor.Language
             return RazorDiagnostic.Create(TagHelper_InconsistentTagStructure, location, firstDescriptor, secondDescriptor, tagName, nameof(TagMatchingRuleDescriptor.TagStructure));
         }
 
+        internal static readonly RazorDiagnosticDescriptor TagHelper_MissingEditorRequired =
+            new RazorDiagnosticDescriptor(
+                $"{DiagnosticPrefix}2012",
+                () => "No value specified for parameter '{0}' for component <{1}>.",
+                RazorDiagnosticSeverity.Warning);
+
+        public static RazorDiagnostic CreateTagHelper_MissingEditorRequired(SourceSpan location, string parameterName, string tagName)
+        {
+            return RazorDiagnostic.Create(TagHelper_MissingEditorRequired, location, parameterName, tagName);
+        }
+
         #endregion
 
         #region TagHelper Errors

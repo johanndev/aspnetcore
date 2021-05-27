@@ -517,6 +517,60 @@ namespace Test
             CompileToAssembly(generated);
         }
 
+        [Fact]
+        public void Component_WithEditorRequiredParameter_NoValueSpecified()
+        {
+            AdditionalSyntaxTrees.Add(Parse(@"
+using System;
+using Microsoft.AspNetCore.Components;
+namespace Test
+{
+    public class ComponentWithEditorRequiredParameters : ComponentBase
+    {
+        [Parameter]
+        [EditorRequired]
+        public string Property1 { get; set; }
+    }
+} 
+"));
+            var generated = CompileToCSharp(@"
+<ComponentWithEditorRequiredParameters />
+");
+            AssertDocumentNodeMatchesBaseline(generated.CodeDocument);
+            AssertCSharpDocumentMatchesBaseline(generated.CodeDocument);
+            CompileToAssembly(generated, throwOnFailure: false);
+
+            var diagnostics = Assert.Single(generated.Diagnostics);
+            Assert.Equal(RazorDiagnosticSeverity.Warning, diagnostics.Severity);
+            Assert.Equal("RZ2012", diagnostics.Id);
+        }
+
+        [Fact]
+        public void Component_WithEditorRequiredParameter_ValueSpecified()
+        {
+            AdditionalSyntaxTrees.Add(Parse(@"
+using System;
+using Microsoft.AspNetCore.Components;
+namespace Test
+{
+    public class ComponentWithEditorRequiredParameters : ComponentBase
+    {
+        [Parameter]
+        [EditorRequired]
+        public string Property1 { get; set; }
+    }
+} 
+"));
+            var generated = CompileToCSharp(@"
+<ComponentWithEditorRequiredParameters Property1=""Some Value"" />
+");
+            AssertDocumentNodeMatchesBaseline(generated.CodeDocument);
+            AssertCSharpDocumentMatchesBaseline(generated.CodeDocument);
+            CompileToAssembly(generated);
+
+            Assert.Empty(generated.Diagnostics);
+        }
+
         #endregion
 
         #region Bind

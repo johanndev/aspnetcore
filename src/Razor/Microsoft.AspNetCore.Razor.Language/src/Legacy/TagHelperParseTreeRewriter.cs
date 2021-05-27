@@ -274,6 +274,8 @@ namespace Microsoft.AspNetCore.Razor.Language.Legacy
                 // We're in a start TagHelper block.
                 ValidateStartTagSyntax(tagName, startTag);
 
+                ValidateEditorRequiredAttributes(tagHelperBinding, elementAttributes, startTag);
+
                 var rewrittenStartTag = TagHelperBlockRewriter.Rewrite(
                     tagName,
                     _featureFlags,
@@ -287,6 +289,26 @@ namespace Microsoft.AspNetCore.Razor.Language.Legacy
                 rewritten = rewrittenStartTag;
 
                 return true;
+            }
+
+            // Determine if there are any attributes required by the editor that are not present.
+            private void ValidateEditorRequiredAttributes(
+                TagHelperBinding tagHelperBinding,
+                IReadOnlyList<KeyValuePair<string, string>> elementAttributes,
+                MarkupStartTagSyntax tagBlock)
+            {
+                foreach (var result in tagHelperBinding.Descriptors)
+                {
+                    var unavailableAttributes = result.BoundAttributes.Where(b => b.IsEditorRequired && !elementAttributes.Any(f => f.Key == b.Name));
+                    foreach (var attribute in unavailableAttributes)
+                    {
+                        _errorSink.OnError(
+                            RazorDiagnosticFactory.CreateTagHelper_MissingEditorRequired(
+                                new SourceSpan(tagBlock.GetSourceLocation(_source), tagBlock.FullWidth),
+                                attribute.Name,
+                                result.DisplayName));
+                    }
+                }
             }
 
             private bool TryRewriteTagHelperEnd(MarkupStartTagSyntax startTag, MarkupEndTagSyntax endTag, out MarkupTagHelperEndTagSyntax rewritten)

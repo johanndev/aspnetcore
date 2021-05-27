@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
@@ -12,6 +12,8 @@ namespace Microsoft.AspNetCore.Razor.Language
         public abstract string TypeName { get; set; }
 
         public abstract bool IsEnum { get; set; }
+
+        internal bool IsRequired { get; set; }
 
         public abstract string Documentation { get; set; }
 
